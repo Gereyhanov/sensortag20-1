@@ -1,3 +1,8 @@
 The code from:
 https://git.ti.com/sensortag-20-android
 
+Changes:
+ - removed 'HELP' tabs
+ - removed Menu items: tie2e, sthome, license
+ - replaced logo and some of icon images
+ - changed draw method, overwrite onscreen result without scrolling 

@@ -301,12 +301,13 @@ public class ScanView extends Fragment {
 
       String descr = name + "\n" + device.getAddress() + "\nRssi: " + rssi + " dBm";
       ((TextView) vg.findViewById(R.id.descr)).setText(descr);
-      
+
+      // change image icon based on device name
       ImageView iv = (ImageView)vg.findViewById(R.id.devImage);
       if (name.equals("SensorTag2") || name.equals("CC2650 SensorTag"))
       	iv.setImageResource(R.drawable.sensortag2_300);
       else {
-    	  iv.setImageResource(R.drawable.sensortag_300);
+    	iv.setImageResource(R.drawable.sensortag_300);
       }
       // Disable connect button when connecting or connected
       Button bv = (Button)vg.findViewById(R.id.btnConnect);

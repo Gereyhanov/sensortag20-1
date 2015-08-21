@@ -169,9 +169,11 @@ import com.example.ti.ble.common.IBMIoTCloudProfile;
 		// GUI
 		mDeviceView = new DeviceView();
 		mSectionsPagerAdapter.addSection(mDeviceView, "Sensors");
+		/*
 		HelpView hw = new HelpView();
 		hw.setParameters("help_device.html", R.layout.fragment_help, R.id.webpage);
 		mSectionsPagerAdapter.addSection(hw, "Help");
+		*/
 		mProfiles = new ArrayList<GenericBluetoothProfile>();
 		progressDialog = new ProgressDialog(DeviceActivity.this);
 		progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);

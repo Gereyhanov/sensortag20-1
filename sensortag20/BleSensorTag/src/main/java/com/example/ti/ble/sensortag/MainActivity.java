@@ -151,11 +151,11 @@ public class MainActivity extends ViewPagerActivity {
 		// Create the fragments and add them to the view pager and tabs
 		mScanView = new ScanView();
 		mSectionsPagerAdapter.addSection(mScanView, "BLE Device List");
-		
+		/* vliu: do not like to have 'HELP' for this version
 		HelpView hw = new HelpView();
 		hw.setParameters("help_scan.html", R.layout.fragment_help, R.id.webpage);
 		mSectionsPagerAdapter.addSection(hw, "Help");
-
+		*/
 		// Register the BroadcastReceiver
 		mFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
 		mFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
@@ -193,6 +193,7 @@ public class MainActivity extends ViewPagerActivity {
 		case R.id.opt_bt:
 			onBluetooth();
 			break;
+/* vliu: remove menu items
 		case R.id.opt_e2e:
 			onUrl(URL_FORUM);
 			break;
@@ -202,6 +203,7 @@ public class MainActivity extends ViewPagerActivity {
 		case R.id.opt_license:
 			onLicense();
 			break;
+*/
 		case R.id.opt_about:
 			onAbout();
 			break;

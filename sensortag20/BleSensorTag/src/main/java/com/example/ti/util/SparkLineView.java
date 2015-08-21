@@ -54,8 +54,6 @@
  **************************************************************************************************/
 package com.example.ti.util;
 
-import java.util.ArrayList;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -63,7 +61,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
+import android.util.Log;
 import android.view.View;
+
+import java.util.ArrayList;
 
 @SuppressLint("DrawAllocation") public class SparkLineView extends View {
 	private final int numberOfPoints = 15;
@@ -76,6 +77,8 @@ import android.view.View;
 	public float minVal;
 	public boolean autoScale = false;
 	public boolean autoScaleBounceBack = false;
+	public int lastPoint = 0;
+
 	public SparkLineView(Context context) {
 		   super(context);
 		this.sparkLinePaint = new Paint() {
@@ -174,7 +177,6 @@ import android.view.View;
 				//Control point 
 				PointF c1;
 				PointF c2;
-				
 				p0.x = ((w - (2 * border) )/ iterations) * (ii - 1) + border;
 				p0.y= h - border - (((h - (2 * border)) / (this.maxVal - this.minVal)) * (v0 - this.minVal));
 				p1.x = ((w - (2 * border) )/ iterations) * (ii) + border;
@@ -184,9 +186,21 @@ import android.view.View;
 				path.quadTo(c1.x, c1.y, midPoint.x, midPoint.y);
 				c2 = this.controlPointForPoints(midPoint, p1);
 				path.quadTo(c2.x, c2.y, p1.x, p1.y);
+
+				// start a new path
+				if ((ii + 1 == this.lastPoint) && (ii + 2 < iterations)) {
+					canvas.drawPath(path,this.sparkLinePaint);
+					path = new Path();
+					ii ++;
+					v0 = subList.get(ii);
+					p0.x = ((w - (2 * border) )/ iterations) * ii + border;
+					p0.y= h - border - (((h - (2 * border)) / (this.maxVal - this.minVal)) * (v0 - this.minVal));
+					path.moveTo(p0.x, p0.y);
+				}
 			}
 		}
-		canvas.drawPath(path,this.sparkLinePaint);
+		canvas.drawPath(path, this.sparkLinePaint);
+		/*
 		for (ii = 0; ii < iterations; ii++) {
 			Float v = subList.get(ii);
 			Float x,y;
@@ -194,7 +208,7 @@ import android.view.View;
 			y =  h - border - (((h - (2 * border)) / (this.maxVal - this.minVal)) * (v - this.minVal));
 			canvas.drawCircle(x,y, 10, this.pointStrokePaint);
 			canvas.drawCircle(x,y, 7, this.pointFillPaint);
-		}
+		} */
 	}
 	
 	PointF controlPointForPoints(PointF p1, PointF p2) {
@@ -229,7 +243,23 @@ import android.view.View;
 	}
 	public void addValue(float value) {
 		Float val = Float.valueOf(value);
-		this.dataPoints.add(val);
+		//this.dataPoints.add(val);
+
+		if (this.dataPoints.size() < numberOfPoints) {
+			this.dataPoints.add(val);
+			this.lastPoint = this.dataPoints.size();
+		} else {
+			this.dataPoints.set(this.lastPoint, val);
+			this.lastPoint ++;
+		}
+		if (this.lastPoint >= numberOfPoints) {
+			this.lastPoint = 0;
+			// copy the last point to beginning as new start
+			this.dataPoints.set(this.lastPoint, val);
+			this.lastPoint ++;
+		}
+
+		//Log.d("vliu", "item: " + this.lastPoint + "/" + this.dataPoints.size() + ": " + value);
 		this.invalidate();
 	}
 	public void setColor(int a,int r,int g, int b) {
