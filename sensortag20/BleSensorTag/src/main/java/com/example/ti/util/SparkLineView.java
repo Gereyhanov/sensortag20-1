@@ -67,10 +67,11 @@ import android.view.View;
 import java.util.ArrayList;
 
 @SuppressLint("DrawAllocation") public class SparkLineView extends View {
-	private final int numberOfPoints = 15;
+	private final int numberOfPoints = 400;
 	private final Paint pointStrokePaint;
 	private final Paint pointFillPaint;
 	private final Paint sparkLinePaint;
+	private final Paint cursorLinePaint;
 	private ArrayList<Float> dataPoints;
 	public float displayWidth;
 	public float maxVal;
@@ -102,6 +103,15 @@ import java.util.ArrayList;
 				setARGB(255, 255, 0, 0);
 				setStyle(Style.FILL);
 				setAntiAlias(true);
+			}
+		};
+		this.cursorLinePaint = new Paint() {
+			{
+				setStyle(Paint.Style.STROKE);
+				setStrokeCap(Paint.Cap.ROUND);
+				setStrokeWidth(1.0f);
+				setAntiAlias(true);
+				setARGB(150, 0, 0, 0);
 			}
 		};
 		this.dataPoints = new ArrayList<Float>();
@@ -157,6 +167,17 @@ import java.util.ArrayList;
 			if (this.minVal < -0.1f) this.minVal = -max;
 			else this.minVal = 0.0f;
 		}
+
+		// cursor line
+		if (lastPoint != 0) {
+			ii = lastPoint - 1;
+			Float x = ((w - (2 * border) )/ iterations) * ii + border;
+			Path cursorPath = new Path();
+			cursorPath.moveTo(x, 0);
+			cursorPath.lineTo(x, h);
+			canvas.drawPath(cursorPath, this.cursorLinePaint);
+		}
+
 		for (ii = 0; ii < iterations; ii++) {
 			if (ii == 0) {
 				Float v = subList.get(ii);
@@ -182,10 +203,11 @@ import java.util.ArrayList;
 				p1.x = ((w - (2 * border) )/ iterations) * (ii) + border;
 				p1.y = h - border - (((h - (2 * border)) / (this.maxVal - this.minVal)) * (v1 - this.minVal));
 				midPoint = this.midPointForPoints(p0, p1);
-				c1 = this.controlPointForPoints(midPoint, p0);
-				path.quadTo(c1.x, c1.y, midPoint.x, midPoint.y);
-				c2 = this.controlPointForPoints(midPoint, p1);
-				path.quadTo(c2.x, c2.y, p1.x, p1.y);
+				//c1 = this.controlPointForPoints(midPoint, p0);
+				//path.quadTo(c1.x, c1.y, midPoint.x, midPoint.y);
+				path.lineTo(p1.x, p1.y);
+				//c2 = this.controlPointForPoints(midPoint, p1);
+				//path.quadTo(c2.x, c2.y, p1.x, p1.y);
 
 				// start a new path
 				if ((ii + 1 == this.lastPoint) && (ii + 2 < iterations)) {
@@ -200,8 +222,9 @@ import java.util.ArrayList;
 			}
 		}
 		canvas.drawPath(path, this.sparkLinePaint);
-		/*
-		for (ii = 0; ii < iterations; ii++) {
+	/*
+		if (lastPoint != 0) {
+			ii = lastPoint - 1;
 			Float v = subList.get(ii);
 			Float x,y;
 			x = ((w - (2 * border) )/ iterations) * ii + border;

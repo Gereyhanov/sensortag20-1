@@ -189,7 +189,27 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
 	@Override 
 	public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c) {
         byte[] value = c.getValue();
+        String ecg = "";
+        for (int x = 0; x < value.length; x ++) {
+            ecg += value[x] + ", ";
+        }
+        Log.d("vliu", "value: " + ecg);
 		if (c.equals(this.dataC)){
+            for (int offset = 0; offset < value.length; offset ++) {
+                Integer v = (int) (value[offset] & 0xFF);
+                if (v > 127) {
+                    v = v - 256;
+                }
+                if (!(this.isHeightCalibrated)) {
+                    BarometerCalibrationCoefficients.INSTANCE.heightCalibration = v;
+                    //Toast.makeText(this.tRow.getContext(), "Height measurement calibrated",
+                    //			    Toast.LENGTH_SHORT).show();
+                    this.isHeightCalibrated = true;
+                }
+                Log.d("vliu", "data:" + v);
+                this.tRow.sl1.addValue(v + 10);
+            }
+            /*
 			Point3D v;
 			v = Sensor.BAROMETER.convert(value);
 			if (!(this.isHeightCalibrated)) {
@@ -205,6 +225,7 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
 			if (this.tRow.config == false) this.tRow.value.setText(String.format("%.1f mBar %.1f meter", v.x / 100, h));
 			this.tRow.sl1.addValue((float)v.x / 100.0f);
 			//mBarValue.setText(msg);
+			*/
 		}
 	}
 	
