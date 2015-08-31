@@ -80,7 +80,6 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -307,7 +306,16 @@ public class IBMIoTCloudProfile extends GenericBluetoothProfile {
         this.valueMap.put(variableName,Value);
     }
     public void addSensorValueToPendingMessage(Map.Entry<String,String> e) {
-        this.valueMap.put(e.getKey(),e.getValue());
+        String key = e.getKey();
+        String value = this.valueMap.get(key);
+        if (value == null) {
+            long t = System.currentTimeMillis();
+            // add timestamp for the first event
+            this.valueMap.put("time_" + key, String.format("%d", t));
+            value = e.getValue();
+        } else
+            value += "," + e.getValue();
+        this.valueMap.put(key, value);
     }
     @Override
     public void onPause() {
@@ -359,6 +367,8 @@ public class IBMIoTCloudProfile extends GenericBluetoothProfile {
                     String publishValues = "";
                     Map<String, String> dict = new HashMap<String, String>();
                     dict.putAll(valueMap);
+                    dict.put("client_id", client.getClientId());
+                    valueMap = new HashMap<String, String>(); // reset for next loop
                     for (Map.Entry<String, String> entry : dict.entrySet()) {
                         String var = entry.getKey();
                         String val = entry.getValue();
