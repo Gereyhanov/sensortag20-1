@@ -642,7 +642,7 @@ import com.example.ti.ble.common.IBMIoTCloudProfile;
                                 Map<String,String> map = p.getMQTTMap();
                                 if (map != null) {
                                     for (Map.Entry<String, String> e : map.entrySet()) {
-                                        if (mqttProfile != null)
+                                        if ((mqttProfile != null) && mqttProfile.ready)
                                             mqttProfile.addSensorValueToPendingMessage(e);
                                     }
                                 }
