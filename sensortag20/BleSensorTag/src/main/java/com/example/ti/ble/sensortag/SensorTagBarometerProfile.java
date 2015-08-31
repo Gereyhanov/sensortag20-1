@@ -76,6 +76,8 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
 	private boolean isCalibrated;
 	private boolean isHeightCalibrated;
 	private static final double PA_PER_METER = 12.0;
+    private int positiveECG = 0;
+    private int adjustCounter = 0;
 	public SensorTagBarometerProfile(Context con,BluetoothDevice device,BluetoothGattService service,BluetoothLeService controller) {
 		super(con,device,service,controller);
 		this.tRow =  new SensorTagBarometerTableRow(con);
@@ -189,43 +191,53 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
 	@Override 
 	public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c) {
         byte[] value = c.getValue();
-        String ecg = "";
-        for (int x = 0; x < value.length; x ++) {
-            ecg += value[x] + ", ";
+        Boolean checkSawWave = false;
+        if (checkSawWave == true) {
+            int err = 0;
+            if (value[0] == 0) {
+                if ((value[1] != 1) || (value[2] != 2) || (value[3] != 3) || (value[4] != 4) || (value[5] != 5)) {
+                    err = 1;
+                }
+            } else if (value[0] == -5) {
+                if ((value[1] != -4) || (value[2] != -3) || (value[3] != -2) || (value[4] != -1) || (value[5] != 0)) {
+                    err = 1;
+                }
+            } else {
+                err = 1;
+            }
+            if (err != 0) {
+                String ecg = "";
+                for (int x = 0; x < value.length; x++) {
+                    ecg += value[x] + ", ";
+                }
+                Log.d("vliu", "value: " + ecg);
+            }
         }
-        Log.d("vliu", "value: " + ecg);
+        // try to decrease positiveECG value every 5 second
+        this.adjustCounter --;
+        if (this.adjustCounter <= 0) {
+            this.positiveECG --;
+			// data fraquency is 48ms
+			// 20 events per second, 100 event per 5 seconds
+            this.adjustCounter = 100; // every 5 seconds
+        }
 		if (c.equals(this.dataC)){
             for (int offset = 0; offset < value.length; offset ++) {
-                Integer v = (int) (value[offset] & 0xFF);
-                if (v > 127) {
-                    v = v - 256;
+                int v = value[offset];
+                if (v < -positiveECG) {
+                    this.positiveECG = -v;   // automatically shift values to positive
+                    this.adjustCounter = 200;  // keep this level 10 seconds
                 }
+
                 if (!(this.isHeightCalibrated)) {
                     BarometerCalibrationCoefficients.INSTANCE.heightCalibration = v;
                     //Toast.makeText(this.tRow.getContext(), "Height measurement calibrated",
                     //			    Toast.LENGTH_SHORT).show();
                     this.isHeightCalibrated = true;
                 }
-                Log.d("vliu", "data:" + v);
-                this.tRow.sl1.addValue(v + 10);
+                //Log.d("vliu", "data:" + v);
+                this.tRow.sl1.addValue(v + positiveECG);
             }
-            /*
-			Point3D v;
-			v = Sensor.BAROMETER.convert(value);
-			if (!(this.isHeightCalibrated)) {
-				BarometerCalibrationCoefficients.INSTANCE.heightCalibration = v.x;
-				//Toast.makeText(this.tRow.getContext(), "Height measurement calibrated",
-				//			    Toast.LENGTH_SHORT).show();
-				this.isHeightCalibrated = true;
-			}
-			double h = (v.x - BarometerCalibrationCoefficients.INSTANCE.heightCalibration)
-			    / PA_PER_METER;
-			h = (double) Math.round(-h * 10.0) / 10.0;
-			//msg = decimal.format(v.x / 100.0f) + "\n" + h;
-			if (this.tRow.config == false) this.tRow.value.setText(String.format("%.1f mBar %.1f meter", v.x / 100, h));
-			this.tRow.sl1.addValue((float)v.x / 100.0f);
-			//mBarValue.setText(msg);
-			*/
 		}
 	}
 	
@@ -234,9 +246,17 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
 	}
     @Override
     public Map<String,String> getMQTTMap() {
-        Point3D v = Sensor.BAROMETER.convert(this.dataC.getValue());
+        byte[] value = this.dataC.getValue();
         Map<String,String> map = new HashMap<String, String>();
-        map.put("air_pressure",String.format("%.2f",v.x / 100));
+        String mapValue = null;
+        for (int offset = 0; offset < value.length; offset ++) {
+            int v = value[offset];
+            if (mapValue == null)
+                mapValue = String.format("%d", v);
+            else
+                mapValue += "," + String.format("%d", v);
+        }
+        map.put("ecg",mapValue);
         return map;
     }
 }
