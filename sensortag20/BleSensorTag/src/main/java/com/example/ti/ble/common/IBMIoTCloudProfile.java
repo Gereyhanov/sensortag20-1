@@ -99,6 +99,7 @@ public class IBMIoTCloudProfile extends GenericBluetoothProfile {
     MemoryPersistence memPer;
     final String addrShort;
     static IBMIoTCloudProfile mThis;
+    private final Object lockValueMap = new Object();
     Map<String, String> valueMap = new HashMap<String, String>();
     Timer publishTimer;
     public boolean ready;
@@ -247,10 +248,12 @@ public class IBMIoTCloudProfile extends GenericBluetoothProfile {
                     Log.d("IBMIoTCloudProfile", "Connected to cloud : " + client.getServerURI() + "," + client.getClientId());
 
                     try {
-                        client.publish(config.publishTopic,jsonEncode("myName",mBTDevice.getName().toString()).getBytes(),0,false);
+                        client.publish(config.publishTopic, jsonEncode("myName", mBTDevice.getName().toString()).getBytes(), 0, false);
                         ready = true;
-                    }
-                    catch (MqttException e) {
+                        synchronized (lockValueMap) {
+                            valueMap = new HashMap<String, String>();
+                        }
+                    } catch (MqttException e) {
                         e.printStackTrace();
                     }
 
@@ -260,8 +263,8 @@ public class IBMIoTCloudProfile extends GenericBluetoothProfile {
 
                 @Override
                 public void onFailure(IMqttToken iMqttToken, Throwable throwable) {
-                    Log.d("IBMIoTCloudProfile","Connection to IBM cloud failed !");
-                    Log.d("IBMIoTCloudProfile","Error: " + throwable.getLocalizedMessage());
+                    Log.d("IBMIoTCloudProfile", "Connection to IBM cloud failed !");
+                    Log.d("IBMIoTCloudProfile", "Error: " + throwable.getLocalizedMessage());
                     ((IBMIoTCloudTableRow) tRow).setCloudConnectionStatusImage(context.getResources().getDrawable(R.drawable.cloud_disconnected));
                 }
             });
@@ -303,19 +306,43 @@ public class IBMIoTCloudProfile extends GenericBluetoothProfile {
         }
     }
     public void addSensorValueToPendingMessage(String variableName, String Value) {
-        this.valueMap.put(variableName,Value);
+        synchronized(lockValueMap) {
+            this.valueMap.put(variableName, Value);
+        }
     }
-    public void addSensorValueToPendingMessage(Map.Entry<String,String> e) {
-        String key = e.getKey();
-        String value = this.valueMap.get(key);
-        if (value == null) {
-            long t = System.currentTimeMillis();
-            // add timestamp for the first event
-            this.valueMap.put("time_" + key, String.format("%d", t));
-            value = e.getValue();
-        } else
-            value += "," + e.getValue();
-        this.valueMap.put(key, value);
+
+    public void addSensorValueToPendingMessage(Map<String,String> map) {
+        if (!this.ready)
+            return;
+        synchronized(lockValueMap) {
+            for (Map.Entry<String, String> e : map.entrySet()) {
+                String key = e.getKey();
+                String value = e.getValue();
+                //
+                if (key == "name") {
+                    String index = "";
+                    String item = "start_" + value;
+                    if (this.valueMap.get(item) == null) {
+                        long t = System.currentTimeMillis();
+                        // add timestamp for the first event
+                        this.valueMap.put(item, String.format("%d", t));
+                        this.valueMap.put("index_" + value, "0");
+                    } else {
+                        index = this.valueMap.get("index_" + value);
+                        index = String.format("%d", Integer.parseInt(index) + 1);
+                        this.valueMap.put("index_" + value, index);
+                    }
+                } else {
+                    String newValue = this.valueMap.get(key);
+                    if (newValue == null) {
+                        newValue = value;
+                    } else {
+                        newValue += "," + value;
+                    }
+                    this.valueMap.put(key, newValue);
+                }
+            }
+        }
     }
     @Override
     public void onPause() {
@@ -368,7 +395,10 @@ public class IBMIoTCloudProfile extends GenericBluetoothProfile {
                     Map<String, String> dict = new HashMap<String, String>();
                     dict.putAll(valueMap);
                     dict.put("client_id", client.getClientId());
-                    valueMap = new HashMap<String, String>(); // reset for next loop
+                    synchronized(lockValueMap) {
+                        valueMap = new HashMap<String, String>();
+                    }
+
                     for (Map.Entry<String, String> entry : dict.entrySet()) {
                         String var = entry.getKey();
                         String val = entry.getValue();

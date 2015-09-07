@@ -112,7 +112,7 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
 		
 		this.tRow.title.setText(GattInfo.uuidToName(UUID.fromString(this.dataC.getUuid().toString())));
 		this.tRow.uuidLabel.setText(this.dataC.getUuid().toString());
-		this.tRow.value.setText("0.0mBar, 0.0m");
+		this.tRow.value.setHeight(10); // invisible the text view
 		this.tRow.periodBar.setProgress(100);
 	}
 	
@@ -244,6 +244,7 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
 	protected void calibrationButtonTouched() {
 		this.isHeightCalibrated = false;
 	}
+
     @Override
     public Map<String,String> getMQTTMap() {
         byte[] value = this.dataC.getValue();
@@ -257,6 +258,7 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
                 mapValue += "," + String.format("%d", v);
         }
         map.put("ecg",mapValue);
+        map.put("name", "ecg");
         return map;
     }
 }

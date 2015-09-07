@@ -501,6 +501,7 @@ import com.example.ti.ble.common.IBMIoTCloudProfile;
                                         lux.grayOutCell(true);
                                     }
                                 }
+								/*
                                 if (SensorTagSimpleKeysProfile.isCorrectService(s)) {
                                     SensorTagSimpleKeysProfile key = new SensorTagSimpleKeysProfile(context,mBluetoothDevice,s,mBtLeService);
                                     mProfiles.add(key);
@@ -512,7 +513,7 @@ import com.example.ti.ble.common.IBMIoTCloudProfile;
                                         key.grayOutCell(true);
                                     }
                                     Log.d("DeviceActivity","Found Simple Keys !");
-                                }
+                                } */
                                 if (SensorTagBarometerProfile.isCorrectService(s)) {
                                     SensorTagBarometerProfile baro = new SensorTagBarometerProfile(context,mBluetoothDevice,s,mBtLeService);
                                     mProfiles.add(baro);
@@ -574,6 +575,7 @@ import com.example.ti.ble.common.IBMIoTCloudProfile;
                                     Log.d("DeviceActivity","Found Motion !");
 
                                 }
+								/*
                                 if (DeviceInformationServiceProfile.isCorrectService(s)) {
                                     DeviceInformationServiceProfile devInfo = new DeviceInformationServiceProfile(context,mBluetoothDevice,s,mBtLeService);
                                     mProfiles.add(devInfo);
@@ -586,7 +588,7 @@ import com.example.ti.ble.common.IBMIoTCloudProfile;
                                     oad.configureService();
                                     mOadService = s;
                                     Log.d("DeviceActivity","Found TI OAD Service");
-                                }
+                                } */
                                 if ((s.getUuid().toString().compareTo("f000ccc0-0451-4000-b000-000000000000")) == 0) {
                                     mConnControlService = s;
                                 }
@@ -641,10 +643,8 @@ import com.example.ti.ble.common.IBMIoTCloudProfile;
                                 //Do MQTT
                                 Map<String,String> map = p.getMQTTMap();
                                 if (map != null) {
-                                    for (Map.Entry<String, String> e : map.entrySet()) {
-                                        if ((mqttProfile != null) && mqttProfile.ready)
-                                            mqttProfile.addSensorValueToPendingMessage(e);
-                                    }
+									if (mqttProfile != null)
+										mqttProfile.addSensorValueToPendingMessage(map);
                                 }
                             }
                         }

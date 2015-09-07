@@ -169,8 +169,8 @@ import java.util.ArrayList;
 		}
 
 		// cursor line
-		if (lastPoint != 0) {
-			ii = lastPoint - 1;
+		if (this.lastPoint != 0) {
+			ii = this.lastPoint - 1;
 			Float x = ((w - (2 * border) )/ iterations) * ii + border;
 			Path cursorPath = new Path();
 			cursorPath.moveTo(x, 0);
@@ -282,7 +282,6 @@ import java.util.ArrayList;
 			this.lastPoint ++;
 		}
 
-		//Log.d("vliu", "item: " + this.lastPoint + "/" + this.dataPoints.size() + ": " + value);
 		this.invalidate();
 	}
 	public void setColor(int a,int r,int g, int b) {

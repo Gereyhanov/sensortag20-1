@@ -28,7 +28,7 @@
     <item uuid="0xAA32" descr="Write &quot;01&quot; to start Sensor and Measurements, &quot;00&quot; to put to sleep">Magnetometer Config</item>
     <item uuid="0xAA33" descr="Period = [Input*10]ms (lower limit 100ms), default 2000ms">Magnetometer Period</item>
     <item uuid="0xAA40">Barometer Service</item>
-    <item uuid="0xAA41" icon="barometer" descr="TempLSB:TempMSB:PressureLSB:PressureMSB">Barometer Data</item>
+    <item uuid="0xAA41" icon="barometer" descr="TempLSB:TempMSB:PressureLSB:PressureMSB">ECG Data</item>
     <item uuid="0xAA42" descr="Write &quot;01&quot; to start Sensor and Measurements, &quot;00&quot; to put to sleep, &quot;02&quot; to read calibration values from sensor">Barometer Configuration</item>
     <item descr="When write &quot;02&quot; to Barometer conf. has been issued, the calibration values is found here." uuid="0xAA43">Barometer Calibration</item>
     <item uuid="0xAA44" descr="Period = [Input*10] ms, (lower limit 100 ms), default 1000 ms">Barometer Period</item>
