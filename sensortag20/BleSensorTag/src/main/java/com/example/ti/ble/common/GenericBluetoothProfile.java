@@ -160,7 +160,7 @@ public class GenericBluetoothProfile {
 			}
 		}
 	}
-	public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c) {
+	public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c, byte[] value) {
         /*
 		if (c.equals(this.dataC)) {
 			byte[] value = c.getValue();

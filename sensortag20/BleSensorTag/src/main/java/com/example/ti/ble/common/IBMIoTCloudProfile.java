@@ -106,6 +106,7 @@ public class IBMIoTCloudProfile extends GenericBluetoothProfile {
     private WakeLock wakeLock;
     BroadcastReceiver cloudConfigUpdateReceiver;
     cloudConfig config;
+    private static int publishIndex = 0;
 
     public IBMIoTCloudProfile(final Context con,BluetoothDevice device,BluetoothGattService service,BluetoothLeService controller) {
         super(con,device,service,controller);
@@ -250,6 +251,7 @@ public class IBMIoTCloudProfile extends GenericBluetoothProfile {
                     try {
                         client.publish(config.publishTopic, jsonEncode("myName", mBTDevice.getName().toString()).getBytes(), 0, false);
                         ready = true;
+                        publishIndex = 0;  // start a new sequence
                         synchronized (lockValueMap) {
                             valueMap = new HashMap<String, String>();
                         }
@@ -371,7 +373,7 @@ public class IBMIoTCloudProfile extends GenericBluetoothProfile {
 
     }
     @Override
-    public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c) {
+    public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c, byte[] value) {
     }
     @Override
     public void didReadValueForCharacteristic(BluetoothGattCharacteristic c) {
@@ -395,6 +397,8 @@ public class IBMIoTCloudProfile extends GenericBluetoothProfile {
                     Map<String, String> dict = new HashMap<String, String>();
                     dict.putAll(valueMap);
                     dict.put("client_id", client.getClientId());
+                    dict.put("packet", String.format("%d", publishIndex));
+                    publishIndex ++;
                     synchronized(lockValueMap) {
                         valueMap = new HashMap<String, String>();
                     }

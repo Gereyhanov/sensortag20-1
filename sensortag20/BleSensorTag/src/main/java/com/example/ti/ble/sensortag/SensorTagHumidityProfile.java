@@ -112,7 +112,7 @@ public class SensorTagHumidityProfile extends GenericBluetoothProfile {
 			
 		}
 		@Override
-        public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c) {
+        public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c, byte[] values) {
             byte[] value = c.getValue();
 				if (c.equals(this.dataC)){
 					Point3D v = Sensor.HUMIDITY.convert(value);

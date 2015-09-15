@@ -98,7 +98,7 @@ import com.example.ti.util.Point3D;
 			this.tRow.periodBar.setProgress(100);
 		}
         @Override
-        public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c) {
+        public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c, byte[] values) {
             byte[] value = c.getValue();
 			if (c.equals(this.dataC)){
 				if (this.mBTDevice.getName().equals("CC2650 SensorTag")) {

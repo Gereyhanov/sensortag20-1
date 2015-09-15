@@ -188,56 +188,48 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
             }
         }
 	}
-	@Override 
-	public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c) {
-        byte[] value = c.getValue();
-        Boolean checkSawWave = false;
-        if (checkSawWave == true) {
-            int err = 0;
-            if (value[0] == 0) {
-                if ((value[1] != 1) || (value[2] != 2) || (value[3] != 3) || (value[4] != 4) || (value[5] != 5)) {
-                    err = 1;
-                }
-            } else if (value[0] == -5) {
-                if ((value[1] != -4) || (value[2] != -3) || (value[3] != -2) || (value[4] != -1) || (value[5] != 0)) {
-                    err = 1;
-                }
-            } else {
-                err = 1;
-            }
-            if (err != 0) {
-                String ecg = "";
-                for (int x = 0; x < value.length; x++) {
-                    ecg += value[x] + ", ";
-                }
-                Log.d("vliu", "value: " + ecg);
-            }
-        }
+	@Override
+	public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c, byte[] value) {
+        // byte[] value = c.getValue();
+        Integer lowerByte, upperByte;
+        Integer x, y, z;
+        lowerByte = (int) value[0] & 0xFF;
+        upperByte = (int) value[1];
+        x = (upperByte << 8) + lowerByte;
+        lowerByte = (int) value[2] & 0xFF;
+        upperByte = (int) value[3];
+        y = (upperByte << 8) + lowerByte;
+        lowerByte = (int) value[4] & 0xFF;
+        upperByte = (int) value[5];
+        z = (upperByte << 8) + lowerByte;
+
+        Log.d("vliu", "values: " + x + "," + y + "," + z);
         // try to decrease positiveECG value every 5 second
         this.adjustCounter --;
         if (this.adjustCounter <= 0) {
             this.positiveECG --;
 			// data fraquency is 48ms
 			// 20 events per second, 100 event per 5 seconds
-            this.adjustCounter = 100; // every 5 seconds
+            this.adjustCounter = 500; // every 5 seconds
         }
+        Log.d("vliu", "offset: " + positiveECG);
 		if (c.equals(this.dataC)){
-            for (int offset = 0; offset < value.length; offset ++) {
-                int v = value[offset];
-                if (v < -positiveECG) {
-                    this.positiveECG = -v;   // automatically shift values to positive
-                    this.adjustCounter = 200;  // keep this level 10 seconds
-                }
-
-                if (!(this.isHeightCalibrated)) {
-                    BarometerCalibrationCoefficients.INSTANCE.heightCalibration = v;
-                    //Toast.makeText(this.tRow.getContext(), "Height measurement calibrated",
-                    //			    Toast.LENGTH_SHORT).show();
-                    this.isHeightCalibrated = true;
-                }
-                //Log.d("vliu", "data:" + v);
-                this.tRow.sl1.addValue(v + positiveECG);
+            if (!(this.isHeightCalibrated)) {
+            	BarometerCalibrationCoefficients.INSTANCE.heightCalibration = x;
+            	//Toast.makeText(this.tRow.getContext(), "Height measurement calibrated",
+            	//			    Toast.LENGTH_SHORT).show();
+            	this.isHeightCalibrated = true;
             }
+            if (x < -positiveECG)
+                this.positiveECG = (int)-x;
+            if (y < -positiveECG)
+                this.positiveECG = (int)-y;
+            if (z < -positiveECG)
+                this.positiveECG = (int)-z;
+
+            this.tRow.sl1.addValue(x + positiveECG);
+            this.tRow.sl1.addValue(y + positiveECG);
+            this.tRow.sl1.addValue(z + positiveECG);
 		}
 	}
 	

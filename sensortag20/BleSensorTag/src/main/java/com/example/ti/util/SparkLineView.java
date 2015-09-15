@@ -67,7 +67,7 @@ import android.view.View;
 import java.util.ArrayList;
 
 @SuppressLint("DrawAllocation") public class SparkLineView extends View {
-	private final int numberOfPoints = 400;
+	private final int numberOfPoints = 1000;
 	private final Paint pointStrokePaint;
 	private final Paint pointFillPaint;
 	private final Paint sparkLinePaint;

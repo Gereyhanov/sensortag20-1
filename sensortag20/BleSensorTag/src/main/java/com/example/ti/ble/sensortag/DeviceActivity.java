@@ -622,7 +622,11 @@ import com.example.ti.ble.common.IBMIoTCloudProfile;
                             });
                         }
                     });
-                    worker.start();
+					Log.d("vliu", "get priority: " + worker.getPriority());
+					Log.d("vliu", "set priority: " + Thread.MAX_PRIORITY);
+					worker.setPriority(Thread.MAX_PRIORITY);
+
+					worker.start();
                 } else {
                     Toast.makeText(getApplication(), "Service discovery failed",
                             Toast.LENGTH_LONG).show();
@@ -639,7 +643,7 @@ import com.example.ti.ble.common.IBMIoTCloudProfile;
                         for (int jj = 0; jj < mProfiles.size(); jj++) {
                             GenericBluetoothProfile p = mProfiles.get(jj);
                             if (p.isDataC(tempC)) {
-                                p.didUpdateValueForCharacteristic(tempC);
+                                p.didUpdateValueForCharacteristic(tempC, value);
                                 //Do MQTT
                                 Map<String,String> map = p.getMQTTMap();
                                 if (map != null) {

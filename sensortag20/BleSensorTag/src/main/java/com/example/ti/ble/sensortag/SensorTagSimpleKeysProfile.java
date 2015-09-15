@@ -110,7 +110,7 @@ public class SensorTagSimpleKeysProfile extends GenericBluetoothProfile {
 		this.isEnabled = false;
 	}
 	@Override
-	public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c) {
+	public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c, byte[] values) {
 		SensorTagSimpleKeysTableRow tmpRow = (SensorTagSimpleKeysTableRow) this.tRow;
 		if (c.equals(this.dataC)){
             byte[] value = c.getValue();

@@ -134,7 +134,7 @@ public class SensorTagAmbientTemperatureProfile extends GenericBluetoothProfile 
         this.isConfigured = false;
 	}
     @Override
-    public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c) {
+    public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c, byte[] values) {
         byte[] value = c.getValue();
 		if (c.equals(this.dataC)){
 			Point3D v = Sensor.IR_TEMPERATURE.convert(value);
