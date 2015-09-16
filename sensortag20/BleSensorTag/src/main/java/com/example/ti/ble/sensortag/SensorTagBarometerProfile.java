@@ -212,7 +212,6 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
 			// 20 events per second, 100 event per 5 seconds
             this.adjustCounter = 500; // every 5 seconds
         }
-        Log.d("vliu", "offset: " + positiveECG);
 		if (c.equals(this.dataC)){
             if (!(this.isHeightCalibrated)) {
             	BarometerCalibrationCoefficients.INSTANCE.heightCalibration = x;
@@ -238,17 +237,24 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
 	}
 
     @Override
-    public Map<String,String> getMQTTMap() {
-        byte[] value = this.dataC.getValue();
+    public Map<String,String> getMQTTMap(byte[] value) {
+        Integer lowerByte, upperByte;
+        Integer x, y, z;
+        lowerByte = (int) value[0] & 0xFF;
+        upperByte = (int) value[1];
+        x = (upperByte << 8) + lowerByte;
+        lowerByte = (int) value[2] & 0xFF;
+        upperByte = (int) value[3];
+        y = (upperByte << 8) + lowerByte;
+        lowerByte = (int) value[4] & 0xFF;
+        upperByte = (int) value[5];
+        z = (upperByte << 8) + lowerByte;
+
         Map<String,String> map = new HashMap<String, String>();
-        String mapValue = null;
-        for (int offset = 0; offset < value.length; offset ++) {
-            int v = value[offset];
-            if (mapValue == null)
-                mapValue = String.format("%d", v);
-            else
-                mapValue += "," + String.format("%d", v);
-        }
+        String mapValue;
+        mapValue = String.format("%d", x);
+        mapValue += "," + String.format("%d", y);
+        mapValue += "," + String.format("%d", z);
         map.put("ecg",mapValue);
         map.put("name", "ecg");
         return map;

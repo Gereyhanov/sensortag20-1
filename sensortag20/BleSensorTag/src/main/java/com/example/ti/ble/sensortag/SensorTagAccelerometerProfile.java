@@ -133,7 +133,7 @@ public class SensorTagAccelerometerProfile extends GenericBluetoothProfile {
 			}
 	}
     @Override
-    public Map<String,String> getMQTTMap() {
+    public Map<String,String> getMQTTMap(byte[] value) {
         Point3D v = Sensor.ACCELEROMETER.convert(this.dataC.getValue());
         Map<String,String> map = new HashMap<String, String>();
         map.put("acc_x", String.format("%.2f", v.x));

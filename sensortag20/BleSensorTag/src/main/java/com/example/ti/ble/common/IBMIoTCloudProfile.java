@@ -328,18 +328,13 @@ public class IBMIoTCloudProfile extends GenericBluetoothProfile {
                         long t = System.currentTimeMillis();
                         // add timestamp for the first event
                         this.valueMap.put(item, String.format("%d", t));
-                        this.valueMap.put("index_" + value, "0");
-                    } else {
-                        index = this.valueMap.get("index_" + value);
-                        index = String.format("%d", Integer.parseInt(index) + 1);
-                        this.valueMap.put("index_" + value, index);
                     }
                 } else {
                     String newValue = this.valueMap.get(key);
                     if (newValue == null) {
                         newValue = value;
                     } else {
-                        newValue += "," + value;
+                        newValue += "," + value; // append value
                     }
                     this.valueMap.put(key, newValue);
                 }
@@ -395,17 +390,37 @@ public class IBMIoTCloudProfile extends GenericBluetoothProfile {
                     });
                     String publishValues = "";
                     Map<String, String> dict = new HashMap<String, String>();
-                    dict.putAll(valueMap);
                     dict.put("client_id", client.getClientId());
                     dict.put("packet", String.format("%d", publishIndex));
                     publishIndex ++;
                     synchronized(lockValueMap) {
+                        dict.putAll(valueMap);
                         valueMap = new HashMap<String, String>();
                     }
 
+                    // ECG data
+                    String var, val;
+                    publishValues += "\"ecg\":{\n";
+                    var = "start_ecg";
+                    val = dict.get(var);
+                    publishValues += "\"" + var + "\"" + ":" + val + ",\n";
+                    dict.remove(var);
+                    var = "ecg";
+                    val = dict.get(var);
+                    String data[] = val.split(",");
+                    publishValues += "\"data\":[";
+                    if (data.length > 0) {
+                        publishValues += Integer.parseInt(data[0]);
+                        for (int i = 1; i < data.length; i++) {
+                            publishValues += "," + Integer.parseInt(data[i]);
+                        }
+                    }
+                    dict.remove(var);
+                    publishValues += "]\n";
+                    publishValues += "},\n";
                     for (Map.Entry<String, String> entry : dict.entrySet()) {
-                        String var = entry.getKey();
-                        String val = entry.getValue();
+                        var = entry.getKey();
+                        val = entry.getValue();
 
                         publishValues += "\"" + var + "\"" + ":" + "\"" + val + "\"" + ",\n";
                     }

@@ -252,7 +252,7 @@ public class MainActivity extends ViewPagerActivity {
 
 		// License popup on first run
 		if (prefs.getBoolean("firstrun", true)) {
-			onLicense();
+			// onLicense();
 			prefs.edit().putBoolean("firstrun", false).commit();
 		}
 

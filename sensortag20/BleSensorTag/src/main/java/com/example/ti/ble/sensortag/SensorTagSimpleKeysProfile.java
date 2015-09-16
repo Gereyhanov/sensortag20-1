@@ -160,8 +160,8 @@ public class SensorTagSimpleKeysProfile extends GenericBluetoothProfile {
 		}
 	}
     @Override
-    public Map<String,String> getMQTTMap() {
-        byte[] value = this.dataC.getValue();
+    public Map<String,String> getMQTTMap(byte[] value) {
+        //byte[] value = this.dataC.getValue();
         Map<String,String> map = new HashMap<String, String>();
         map.put("key_1",String.format("%d",value[0] & 0x1));
         map.put("key_2",String.format("%d",value[0] & 0x2));

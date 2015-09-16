@@ -207,7 +207,7 @@ public class GenericBluetoothProfile {
         }
 		this.tRow.periodLegend.setText("Sensor period (currently : " + period + "ms)");
 	}
-    public Map<String,String> getMQTTMap() {
+    public Map<String,String> getMQTTMap(byte[] value) {
         return null;
     }
 	public void onOffWasUpdated(boolean on) {

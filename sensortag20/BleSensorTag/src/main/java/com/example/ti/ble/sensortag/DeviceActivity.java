@@ -645,7 +645,7 @@ import com.example.ti.ble.common.IBMIoTCloudProfile;
                             if (p.isDataC(tempC)) {
                                 p.didUpdateValueForCharacteristic(tempC, value);
                                 //Do MQTT
-                                Map<String,String> map = p.getMQTTMap();
+                                Map<String,String> map = p.getMQTTMap(value);
                                 if (map != null) {
 									if (mqttProfile != null)
 										mqttProfile.addSensorValueToPendingMessage(map);

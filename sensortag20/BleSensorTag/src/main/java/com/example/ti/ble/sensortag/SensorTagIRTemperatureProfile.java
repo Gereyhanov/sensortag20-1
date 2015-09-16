@@ -124,7 +124,7 @@ import com.example.ti.util.Point3D;
 			else return false;
 		}
         @Override
-        public Map<String,String> getMQTTMap() {
+        public Map<String,String> getMQTTMap(byte[] value) {
             Point3D v = Sensor.IR_TEMPERATURE.convert(this.dataC.getValue());
             Map<String,String> map = new HashMap<String, String>();
             if (this.mBTDevice.getName().equals("CC2650 SensorTag")) {
