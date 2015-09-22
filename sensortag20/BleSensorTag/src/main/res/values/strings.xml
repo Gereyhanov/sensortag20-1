@@ -97,8 +97,8 @@
     <string name="cloud_config_dialog_use_ssl_checkbox_title">Use SSL</string>
     <string name="cloud_config_dialog_save_button_text">Save settings</string>
     <string-array name="cloud_config_dialog_cloud_services_array">
+        <item>KDM Cloudemist</item>
         <item>IBM IoT Quick Start</item>
-        <item>IBM IoT Foundation</item>
         <item>Custom</item>
     </string-array>
 </resources>

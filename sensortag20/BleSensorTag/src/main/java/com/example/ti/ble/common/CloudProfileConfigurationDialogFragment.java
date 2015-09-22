@@ -303,8 +303,11 @@ public class CloudProfileConfigurationDialogFragment extends DialogFragment impl
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         Log.d("CloudProfileConfigurationDialogFragment", "onItemSelected :" + position);
+        boolean cleanSession = true;
+        boolean useSSL = false;
+        
         switch (position) {
-            case 0:
+            case 1:
                 //IBM IoT Quick Start
                 enDisUsername(false,DEF_CLOUD_IBMQUICKSTART_USERNAME);
                 enDisPassword(false,DEF_CLOUD_IBMQUICKSTART_PASSWORD);
@@ -314,31 +317,14 @@ public class CloudProfileConfigurationDialogFragment extends DialogFragment impl
                 enDisCleanSession(false,CloudProfileConfigurationDialogFragment.DEF_CLOUD_IBMQUICKSTART_CLEAN_SESSION);
                 enDisUseSSL(false,CloudProfileConfigurationDialogFragment.DEF_CLOUD_IBMQUICKSTART_USE_SSL);
                 break;
-            case 1:
-                enDisUsername(true,CloudProfileConfigurationDialogFragment.retrieveCloudPref(CloudProfileConfigurationDialogFragment.PREF_CLOUD_USERNAME,getActivity()));
-                enDisPassword(true,CloudProfileConfigurationDialogFragment.retrieveCloudPref(CloudProfileConfigurationDialogFragment.PREF_CLOUD_PASSWORD,getActivity()));
-                setDeviceId(CloudProfileConfigurationDialogFragment.retrieveCloudPref(CloudProfileConfigurationDialogFragment.PREF_CLOUD_DEVICE_ID,getActivity()));
-                enDisBrokerAddressPort(true,CloudProfileConfigurationDialogFragment.retrieveCloudPref(CloudProfileConfigurationDialogFragment.PREF_CLOUD_BROKER_ADDR,getActivity()),
-                                            CloudProfileConfigurationDialogFragment.retrieveCloudPref(CloudProfileConfigurationDialogFragment.PREF_CLOUD_BROKER_PORT,getActivity()));
-                enDisTopic(true,CloudProfileConfigurationDialogFragment.retrieveCloudPref(CloudProfileConfigurationDialogFragment.PREF_CLOUD_PUBLISH_TOPIC,getActivity()));
-                boolean cleanSession;
-                try {
-                    cleanSession = Boolean.parseBoolean(CloudProfileConfigurationDialogFragment.retrieveCloudPref(CloudProfileConfigurationDialogFragment.PREF_CLOUD_CLEAN_SESSION,getActivity()));
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                    cleanSession = false;
-                }
-                enDisCleanSession(true,cleanSession);
-                boolean useSSL;
-                try {
-                   useSSL = Boolean.parseBoolean(CloudProfileConfigurationDialogFragment.retrieveCloudPref(CloudProfileConfigurationDialogFragment.PREF_CLOUD_USE_SSL,getActivity()));
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                    useSSL = false;
-                }
-                enDisUseSSL(true,useSSL);
+            case 0:
+                enDisUsername(true,"");
+                enDisPassword(true, "");
+                setDeviceId(deviceId);
+                enDisBrokerAddressPort(true,"tcp://dev.cloudemist.com", "1884");
+                enDisTopic(true, "/ecg/" + deviceId);
+                enDisCleanSession(true, true);
+                enDisUseSSL(true,false);
                 break;
             case 2:
                 enDisUsername(true,CloudProfileConfigurationDialogFragment.retrieveCloudPref(CloudProfileConfigurationDialogFragment.PREF_CLOUD_USERNAME,getActivity()));
