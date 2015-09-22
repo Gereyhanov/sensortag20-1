@@ -67,11 +67,13 @@ import android.view.View;
 import java.util.ArrayList;
 
 @SuppressLint("DrawAllocation") public class SparkLineView extends View {
-	private final int numberOfPoints = 1000;
+	private final int seconds = 5;
+	private final int numberOfPoints = seconds * 210;
 	private final Paint pointStrokePaint;
 	private final Paint pointFillPaint;
 	private final Paint sparkLinePaint;
 	private final Paint cursorLinePaint;
+	private final Paint coordPaint1,coordPaint2;
 	private ArrayList<Float> dataPoints;
 	public float displayWidth;
 	public float maxVal;
@@ -112,6 +114,24 @@ import java.util.ArrayList;
 				setStrokeWidth(1.0f);
 				setAntiAlias(true);
 				setARGB(150, 0, 0, 0);
+			}
+		};
+		this.coordPaint1 = new Paint() {
+			{
+				setStyle(Paint.Style.STROKE);
+				setStrokeCap(Paint.Cap.ROUND);
+				setStrokeWidth(1.0f);
+				setAntiAlias(true);
+				setARGB(200, 0, 0, 255);
+			}
+		};
+		this.coordPaint2 = new Paint() {
+			{
+				setStyle(Paint.Style.STROKE);
+				setStrokeCap(Paint.Cap.ROUND);
+				setStrokeWidth(1.0f);
+				setAntiAlias(true);
+				setARGB(100, 0, 0, 127);
 			}
 		};
 		this.dataPoints = new ArrayList<Float>();
@@ -166,6 +186,41 @@ import java.util.ArrayList;
 			this.maxVal = max;
 			if (this.minVal < -0.1f) this.minVal = -max;
 			else this.minVal = 0.0f;
+		}
+
+		// time coordinates
+		for (ii = 0; ii <= this.seconds; ii ++) {
+			Float x;
+			Path coordPath;
+			x = ((w - (2 * border) )/ this.seconds) * ii + border;
+			for (int jj = 0; jj < 4; jj ++) {
+				Float x1 = x + ((w - (2 * border) )/ this.seconds)/4 * jj;
+				coordPath = new Path();
+				coordPath.moveTo(x1, 0);
+				coordPath.lineTo(x1, h);
+				canvas.drawPath(coordPath, this.coordPaint2);
+			}
+			coordPath = new Path();
+			coordPath.moveTo(x, 0);
+			coordPath.lineTo(x, h);
+			canvas.drawPath(coordPath, this.coordPaint1);
+		}
+
+		for (ii = 0; ii < h; ii += ((w - (2 * border) )/ this.seconds)) {
+			int y;
+			Path coordPath;
+			y = ii;
+			for (int jj = 0; jj < 4; jj ++) {
+				Float y1 = y + ((w - (2 * border) )/ this.seconds)/4 * jj;
+				coordPath = new Path();
+				coordPath.moveTo(0, y1);
+				coordPath.lineTo(w, y1);
+				canvas.drawPath(coordPath, this.coordPaint2);
+			}
+			coordPath = new Path();
+			coordPath.moveTo(0, y);
+			coordPath.lineTo(w, y);
+			canvas.drawPath(coordPath, this.coordPaint1);
 		}
 
 		// cursor line

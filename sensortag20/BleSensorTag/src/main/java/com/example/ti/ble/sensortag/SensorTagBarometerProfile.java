@@ -203,7 +203,7 @@ public class SensorTagBarometerProfile extends GenericBluetoothProfile {
         upperByte = (int) value[5];
         z = (upperByte << 8) + lowerByte;
 
-        Log.d("vliu", "values: " + x + "," + y + "," + z);
+        //Log.d("vliu", "values: " + x + "," + y + "," + z);
         // try to decrease positiveECG value every 5 second
         this.adjustCounter --;
         if (this.adjustCounter <= 0) {
