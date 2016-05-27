@@ -67,8 +67,8 @@ import android.view.View;
 import java.util.ArrayList;
 
 @SuppressLint("DrawAllocation") public class SparkLineView extends View {
-	private final int seconds = 5;
-	private final int numberOfPoints = seconds * 210;
+	private final int seconds = 8;
+	private final int numberOfPoints = seconds * 232;
 	private final Paint pointStrokePaint;
 	private final Paint pointFillPaint;
 	private final Paint sparkLinePaint;
